@@ -1,4 +1,6 @@
-﻿using CEPAggregator.Models;
+﻿using CEPAggregator.Classes;
+using CEPAggregator.Classes.Helpers;
+using CEPAggregator.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,18 +12,13 @@ namespace CEPAggregator.Data
         public DbSet<CEP> CEPs { get; set; }
         public DbSet<City> Cities { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, HelperParsersRegistration helperParsers)
             : base(options)
         {
-            if (!Database.EnsureCreated())
+            if (Database.EnsureCreated())
             {
-                InitDB();
+                new InitDBHelper().InitDB(this, helperParsers.Parsers);
             }
-        }
-
-        private void InitDB()
-        {
-            int i = 0;
         }
     }
 }

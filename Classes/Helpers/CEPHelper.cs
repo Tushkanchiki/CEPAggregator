@@ -1,11 +1,11 @@
 ﻿namespace CEPAggregator.Models
 {
-    public class CEP
+    public class CEPHelper
     {
-        public int Id { get; set; }
         public string Name { get; set; }
+        public string CityName { get; set; }
+        public string Address { get; set; }
         public string BankName { get; set; }
         public long? CustomId { get; set; }
-        public Address Address { get; set; }
     }
 }
