@@ -8,9 +8,9 @@ namespace CEPAggregator.Models
 {
     public class ExchangeRate
     {
-        public int Id { get; set; }
         public CurrencyType Source { get; set; }
         public CurrencyType Target { get; set; }
         public double Rate { get; set; }
+        public CEP Cep { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using CEPAggregator.Models;
+﻿using CEPAggregator.Classes;
+using CEPAggregator.Data;
+using CEPAggregator.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,13 +14,24 @@ namespace CEPAggregator.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        
+        private readonly ApplicationDbContext _dbContext;
 
-        public HomeController(ILogger<HomeController> logger)
+
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext dbContext)
         {
             _logger = logger;
+            _dbContext = dbContext;
         }
 
+        [HttpGet]
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Index(InputModel input)
         {
             return View();
         }
