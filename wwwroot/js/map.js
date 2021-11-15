@@ -41,7 +41,8 @@ class Map {
                     balloonContent: cep.name
                 }
             });
-        } 
+        }
+        console.log('hi');
         this.map.geoObjects.add(this.objectManager);
     }
 

@@ -27,7 +27,7 @@ namespace CEPAggregator.Controllers
             if (cep == null)
                 return NoContent();
 
-            return View(new Dictionary<string, string>() { {"aboba", "hi" }, {"aboba2", "hi2" },  });
+            return View((cep, new Dictionary<string, string>() { {"aboba", "hi" }, {"aboba2", "hi2" } }));
         }
     }
 }
