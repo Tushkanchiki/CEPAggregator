@@ -1,21 +1,23 @@
 ﻿@model Dictionary<string, string>
 
-<div class="d-md-flex flex-wrap justify-content-around">
-    <div class="w-50 pt-3">
-        Тут будет карта
-    </div>
+<div class="container">
+    <div class="row">
+        <div class="col-sm pt-3">
+            Тут будет карта
+        </div>
 
-    <div class="w-50 pt-3" style="font-size: xx-large">
-        @foreach (var pair in Model)
-        {
-            <p>
-                <span style="font-weight: bold">
-                   @string.Concat(pair.Key, ": ")
-                </span>
-                <span>
-                    @pair.Value
-                </span>
-            </p>
-        }
+        <div class="col-sm pt-3" style="font-size: x-large">
+            @foreach (var pair in Model)
+            {
+                <p class="mb-0">
+                    <span style="font-weight: bold">
+                        @string.Concat(pair.Key, ": ")
+                    </span>
+                    <span>
+                        @pair.Value
+                    </span>
+                </p>
+            }
+        </div>
     </div>
 </div>
