@@ -5,36 +5,36 @@
 @section scripts{
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=cc3c9a92-a823-4e4b-a881-463ee9054726&lang=ru_RU" type="text/javascript"></script>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Выберите валюту и количество</h1>
+<div>
+    <h6 class="display-4">Выберите валюту и количество</h6>
 
     <form method="post">
-        <div>
-            <label asp-for="Currency">Выберите валюту</label>
-            <select asp-for="Currency" asp-items="Html.GetEnumSelectList<CurrencyType>()">
-            </select>
+        <div class="form-group">
+            <label class="form-label" asp-for="Currency">Выберите валюту</label>
+            <select class="form-select" asp-for="Currency" asp-items="Html.GetEnumSelectList<CurrencyType>()"></select>
         </div>
-        <div>
-            <label asp-for="Count">Выберите количество покупаемой валюты</label>
-            <input type="number" asp-for="Count" />
+        <div class="form-group">
+            <label class="form-label" asp-for="Count">Выберите количество покупаемой валюты</label>
+            <input class="form-control" type="number" asp-for="Count" />
             <span asp-validation-for="Count"></span>
         </div>
-        <div>
-            <label asp-for="UseCurrency">Учитывать курс</label>
-            <input type="checkbox" asp-for="UseCurrency" />
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" asp-for="UseCurrency" />
+            <label class="form-check-label" asp-for="UseCurrency">Учитывать курс</label>
         </div>
-        <div>
-            <label asp-for="UseLocation">Учитывать местоположение</label>
-            <input type="checkbox" asp-for="UseLocation" />
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" asp-for="UseLocation" />
+            <label class="form-check-label" asp-for="UseLocation">Учитывать местоположение</label>
         </div>
-        <div>
-            <label asp-for="UseRating">Учитывать рейтинг</label>
-            <input type="checkbox" asp-for="UseRating" />
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" asp-for="UseRating" />
+            <label class="form-check-label" asp-for="UseRating">Учитывать рейтинг</label>
         </div>
-        <div>
-            <input type="submit" value="Save" />
+        <div class="form-group pt-2">
+            <input class="btn btn-primary" type="submit" value="Save" />
         </div>
     </form>
 </div>
