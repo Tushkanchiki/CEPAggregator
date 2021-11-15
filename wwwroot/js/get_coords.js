@@ -2,7 +2,7 @@
 console.log(ceps);
 async function get_coords() {
     all_coords = [];
-    for (let cep in ceps) {
+    for (let cep of ceps) {
         const address = cep["address"]["city"]["name"] + ", " + cep["address"]["name"];
         console.log(address);
         res = await ymaps.geocode(address, { results: 1 })

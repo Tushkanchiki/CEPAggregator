@@ -7,5 +7,7 @@
         public string BankName { get; set; }
         public long? CustomId { get; set; }
         public Address Address { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
     }
 }
