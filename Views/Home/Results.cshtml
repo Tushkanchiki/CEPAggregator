@@ -1,0 +1,31 @@
+﻿@using CEPAggregator.Enums
+@using CEPAggregator.Classes.Helpers;
+@using System.Text.Json;
+
+@model List<CEPSelector.EvaluatedCEP>
+
+@section scripts{
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=cc3c9a92-a823-4e4b-a881-463ee9054726&lang=ru_RU" type="text/javascript"></script>
+    <script src="~/js/map.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        let map = new Map();
+        ymaps.ready(function () {
+            let evaluated_ceps = @Html.Raw(Json.Serialize(Model));
+            console.log(evaluated_ceps);
+            ceps = []
+            for (evaluated_cep of evaluated_ceps) {
+                ceps.push(evaluated_cep.cep);
+            }
+            map.Init();
+            map.Add(ceps);
+        });
+    </script>
+}
+
+<div>
+    <div id="map" class="border border-light border-3 rounded-3" style="width: 100%; height: 500px;">
+
+    </div>
+</div>

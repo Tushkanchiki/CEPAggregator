@@ -1,21 +1,21 @@
-﻿using CEPAggregator.Classes;
+﻿using CEPAggregator.Classes.Helpers;
 using CEPAggregator.Data;
 using CEPAggregator.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace CEPAggregator.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        
+
         private readonly ApplicationDbContext _dbContext;
 
 
@@ -34,7 +34,18 @@ namespace CEPAggregator.Controllers
         [HttpPost]
         public IActionResult Index(InputModel input)
         {
-            return View();
+            double userX = 0, userY = 0;
+            if (input.UseLocation)
+            {
+                userX = Double.Parse(input.UserX, CultureInfo.InvariantCulture);
+                userY = Double.Parse(input.UserY, CultureInfo.InvariantCulture);
+            }
+            var selector = new CEPSelector(userX, userY, input.Currency, _dbContext);
+            var res = selector.SelectCEPs(_dbContext.CEPs.ToList(), new CEPSelector.SelectionParams { useLocation = input.UseLocation,
+                useRating = input.UseRating,
+                useCurrency = input.UseCurrency,
+                selectCnt = 20 });
+            return View("Results", res);
         }
 
         public IActionResult Privacy()
