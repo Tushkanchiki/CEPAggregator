@@ -103,7 +103,7 @@ namespace CEPAggregator.Classes.Helpers
                 {
                     return ceps.GetRange(0, selParams.selectCnt);
                 }
-                int firstIndex = 0;
+                int nextIndex = 0;
                 var res = new List<EvaluatedCEP>();
                 SelectionParams newParams = selParams;
                 newParams.useLocation = false;
@@ -111,7 +111,6 @@ namespace CEPAggregator.Classes.Helpers
                 int leftToSelect = selParams.selectCnt;
                 for (int i = 0; i < DistanceMilestones.Count; i++)
                 {
-                    int nextIndex = firstIndex;
                     while (nextIndex < ceps.Count && ceps[nextIndex].Distance <= DistanceMilestones[i] * milestoneMult)
                     {
                         nextIndex++;
@@ -122,7 +121,6 @@ namespace CEPAggregator.Classes.Helpers
                     var selected = SelectCEPs(sublist, newParams);
                     leftToSelect -= selected.Count;
                     res = res.Concat(selected).ToList();
-                    firstIndex = nextIndex;
                 }
                 return res;
             }
@@ -134,14 +132,13 @@ namespace CEPAggregator.Classes.Helpers
                 {
                     return ceps.GetRange(0, selParams.selectCnt);
                 }
-                int firstIndex = 0;
+                int nextIndex = 0;
                 var res = new List<EvaluatedCEP>();
                 SelectionParams newParams = selParams;
                 newParams.useRating = false;
                 int leftToSelect = selParams.selectCnt;
                 for (int i = 0; i < RatingMilestones.Count; i++)
                 {
-                    int nextIndex = firstIndex;
                     while (nextIndex < ceps.Count && ceps[nextIndex].Rating >= RatingMilestones[i])
                     {
                         nextIndex++;
@@ -152,7 +149,6 @@ namespace CEPAggregator.Classes.Helpers
                     var selected = SelectCEPs(sublist, newParams);
                     leftToSelect -= selected.Count;
                     res = res.Concat(selected).ToList();
-                    firstIndex = nextIndex;
                 }
                 return res;
             }
