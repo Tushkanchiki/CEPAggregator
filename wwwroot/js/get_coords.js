@@ -3,7 +3,7 @@ console.log(ceps);
 async function get_coords() {
     all_coords = [];
     for (let cep of ceps) {
-        const address = cep["address"]["city"]["name"] + ", " + cep["address"]["name"];
+        const address = cep.address.city.name + ", " + cep.address.name;
         console.log(address);
         res = await ymaps.geocode(address, { results: 1 })
         if (res.geoObjects.getLength() > 0) {
@@ -11,8 +11,8 @@ async function get_coords() {
                 var firstGeoObject = res.geoObjects.get(0),
                     coords = firstGeoObject.geometry.getCoordinates();
                 all_coords.push({
-                    BankName: cep["bankName"],
-                    CustomId: cep["customId"],
+                    BankName: cep.bankName,
+                    CustomId: cep.customId,
                     x: coords[0],
                     y: coords[1]
                 });

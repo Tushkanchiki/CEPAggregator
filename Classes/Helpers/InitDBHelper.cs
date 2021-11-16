@@ -48,10 +48,10 @@ namespace CEPAggregator.Classes
 
         public struct CoordsDescription
         {
-            public string BankName;
-            public long CustomId;
-            public double X;
-            public double Y;
+            public string bankName;
+            public long customId;
+            public double x;
+            public double y;
         }
 
         public const string PathToCoordsFile = "wwwroot/res/CEPs.json";
@@ -67,8 +67,8 @@ namespace CEPAggregator.Classes
             var coords_dict = new Dictionary<Tuple<string, long>, Tuple<double, double>>();
             foreach (var coord in coords)
             {
-                var key = new Tuple<string, long>(coord.BankName, coord.CustomId);
-                var value = new Tuple<double, double>(coord.X, coord.Y);
+                var key = new Tuple<string, long>(coord.bankName, coord.customId);
+                var value = new Tuple<double, double>(coord.x, coord.y);
                 if (!coords_dict.ContainsKey(key))
                 {
                     coords_dict.Add(key, value);
