@@ -13,9 +13,9 @@ namespace CEPAggregator.Classes
 		public const int EOS = 1;
 		public const int BOS = 2;
 		public const int UNK = 3;
-		private readonly InferenceSession session;
+		private static readonly InferenceSession session;
 		private const string pattern = @"[^\w\s+]";
-		private Data data;
+		private static Data data;
 
 		private class Data
         {
@@ -23,19 +23,19 @@ namespace CEPAggregator.Classes
             public List<string> stopwords { get; set; }
         }
 
-		private void ReadDict(string jsonPath)
+		private static void ReadDict()
         {
-			string jsonString = File.ReadAllText("wwwroot/res/" + jsonPath);
+			string jsonString = File.ReadAllText("wwwroot/res/dict.json");
 			data = JsonConvert.DeserializeObject<Data>(jsonString);
         }
 
-		public OnnxModelWrapper(string dictPath, string modelPath)
+		static OnnxModelWrapper()
 		{
-			ReadDict(dictPath);
-			session = new InferenceSession("wwwroot/res/" + modelPath);
+			ReadDict();
+			session = new InferenceSession("wwwroot/res/review_classifier.onnx");
 		}
 
-		private List<string> Tokenize(string input)
+		private static List<string> Tokenize(string input)
         {
 			var tokenized = Regex.Replace(input.ToLower(), pattern, " ").Split(" ");
 			List<string> output = new List<string>();
@@ -49,7 +49,7 @@ namespace CEPAggregator.Classes
 			return output;
         }
 
-		private Int64[] TextToMatrix(string input)
+		private static Int64[] TextToMatrix(string input)
         {
 			var tokens = Tokenize(input);
 			Int64[] result = new Int64[tokens.Count + 2];
@@ -69,9 +69,8 @@ namespace CEPAggregator.Classes
 			return result;
         }
 
-		public int Predict(string comment)
+		public static int Predict(string comment)
 		{
-			comment = "actually this cep looks decent at first glance, but queues were quite long and dollars ran out before I had a chance to buy them";
 			var matrix = TextToMatrix(comment);
 			var inputTensor = new DenseTensor<Int64>(matrix, new int[] { 1, matrix.Length });
 			var input = new List<NamedOnnxValue> { 
