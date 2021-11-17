@@ -34,7 +34,7 @@ namespace CEPAggregator.Classes
                         rate.Cep = cep;
                         rate.Source = Enums.CurrencyType.BYN;
                         rate.Target = Enums.CurrencyType.USD;
-                        rate.Rate = doubleRate / 100;
+                        rate.Rate = doubleRate;
                         rates.Add(rate);
                     }
                     if (double.TryParse((string)s.EUR_out, NumberStyles.Any, CultureInfo.InvariantCulture, out doubleRate))
@@ -43,7 +43,7 @@ namespace CEPAggregator.Classes
                         rate.Cep = cep;
                         rate.Source = Enums.CurrencyType.BYN;
                         rate.Target = Enums.CurrencyType.EUR;
-                        rate.Rate = doubleRate / 100;
+                        rate.Rate = doubleRate;
                         rates.Add(rate);
                     }
                     if (double.TryParse((string)s.RUB_out, NumberStyles.Any, CultureInfo.InvariantCulture, out doubleRate))

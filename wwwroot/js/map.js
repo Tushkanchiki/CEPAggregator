@@ -42,7 +42,6 @@ class Map {
                 }
             });
         }
-        console.log('hi');
         this.map.geoObjects.add(this.objectManager);
     }
 
