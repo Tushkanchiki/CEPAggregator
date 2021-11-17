@@ -1,4 +1,5 @@
 ﻿using CEPAggregator.Classes;
+using CEPAggregator.Classes.Helpers.InfoParsers;
 using CEPAggregator.Data;
 using CEPAggregator.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +24,29 @@ namespace CEPAggregator.Controllers
 
         public IActionResult Index(int id)
         {
-            var cep = _dbContext.CEPs.FirstOrDefault(c => c.Id == id);
+            var cep = _dbContext.CEPs.Include(c => c.Address).ThenInclude(a => a.City).FirstOrDefault(c => c.Id == id);
             if (cep == null)
                 return NoContent();
 
-            return View((cep, new Dictionary<string, string>() { {"aboba", "hi" }, {"aboba2", "hi2" } }));
+            var dict = GetInfo(cep);
+            return View((cep, dict));
+        }
+
+        private Dictionary<string, string> GetInfo(CEP cep)
+        { 
+            switch (cep.BankName)
+            {
+                case Constants.Belarusbank:
+                    BelarusbankInfoParser parser1 = new BelarusbankInfoParser();
+                    return parser1.GetInfo(cep);
+                case Constants.Dabrabyt:
+                    DabrabytInfoParser parser2 = new DabrabytInfoParser();
+                    return parser2.GetInfo(cep);
+                case Constants.AgroBank:
+                    AgroInfoParser parser3 = new AgroInfoParser();
+                    return parser3.GetInfo(cep);
+            }
+            return new Dictionary<string, string>();
         }
     }
 }

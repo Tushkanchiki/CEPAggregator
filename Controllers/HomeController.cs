@@ -34,7 +34,7 @@ namespace CEPAggregator.Controllers
         [HttpPost]
         public IActionResult Index(InputModel input)
         {
-            return View();
+            return RedirectToAction();
         }
 
         public IActionResult Privacy()
