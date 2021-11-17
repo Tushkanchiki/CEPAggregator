@@ -13,8 +13,9 @@ namespace CEPAggregator.Classes
 		public const int EOS = 1;
 		public const int BOS = 2;
 		public const int UNK = 3;
-		private readonly InferenceSession session;
 		private const string pattern = @"[^\w\s+]";
+
+		private readonly InferenceSession session;
 		private Data data;
 
 		private class Data
@@ -71,7 +72,7 @@ namespace CEPAggregator.Classes
 
 		public int Predict(string comment)
 		{
-			comment = "actually this cep looks decent at first glance, but queues were quite long and dollars ran out before I had a chance to buy them";
+			// comment = "actually this cep looks decent at first glance, but queues were quite long and dollars ran out before I had a chance to buy them";
 			var matrix = TextToMatrix(comment);
 			var inputTensor = new DenseTensor<Int64>(matrix, new int[] { 1, matrix.Length });
 			var input = new List<NamedOnnxValue> { 

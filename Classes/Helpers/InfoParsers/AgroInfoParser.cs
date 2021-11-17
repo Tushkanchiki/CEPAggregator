@@ -59,7 +59,7 @@ namespace CEPAggregator.Classes
         public Dictionary<string, string> GetInfo(CEP cep)
         {
             var dict = new Dictionary<string, string>();
-            dict["Банк"] = "Банкагропромбанк";
+            dict["Банк"] = "Белагропромбанк";
             dict["Название обменного пункта"] = cep.Name;
             dict["Адрес"] = $"{cep.Address.City.Name}, {cep.Address.Name}";
 

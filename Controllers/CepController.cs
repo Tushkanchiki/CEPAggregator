@@ -2,6 +2,7 @@
 using CEPAggregator.Classes.Helpers.InfoParsers;
 using CEPAggregator.Data;
 using CEPAggregator.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -22,6 +23,7 @@ namespace CEPAggregator.Controllers
             _dbContext = dbContext;
         }
 
+        [HttpGet]
         public IActionResult Index(int id)
         {
             var cep = _dbContext.CEPs.Include(c => c.Address).ThenInclude(a => a.City).FirstOrDefault(c => c.Id == id);
@@ -29,7 +31,17 @@ namespace CEPAggregator.Controllers
                 return NoContent();
 
             var dict = GetInfo(cep);
-            return View((cep, dict));
+            var comments = _dbContext.Comments.Where(c => c.CEP == cep).ToList();
+            return View((cep, dict, comments));
+        }
+
+        [HttpPost]
+        public IActionResult Index(int id, Comment comment)
+        {
+            _dbContext.Comments.Add(comment);
+            _dbContext.SaveChanges();
+
+            return RedirectToAction("Index", id);
         }
 
         private Dictionary<string, string> GetInfo(CEP cep)
