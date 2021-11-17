@@ -15,5 +15,7 @@ namespace CEPAggregator.Models
         public bool UseLocation { get; set; }
         public bool UseRating { get; set; }
         public bool UseCurrency { get; set; }
+        public string UserX { get; set; }
+        public string UserY { get; set; }
     }
 }

@@ -6,12 +6,33 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     <script src="https://api-maps.yandex.ru/2.1/?apikey=cc3c9a92-a823-4e4b-a881-463ee9054726&lang=ru_RU" type="text/javascript"></script>
+    <script type="text/javascript">
+        function addGeolocation() {
+            if (document.getElementById("location-checkbox").checked) {
+                ymaps.ready(function () {
+                    ymaps.geolocation.get().then(function (res) {
+                        let coords = res.geoObjects.position;
+                        document.getElementById("user-x").value = coords[0];
+                        document.getElementById("user-y").value = coords[1];
+                        document.getElementById("input-form").submit();
+                    }, function (e) {
+                            document.getElementById("location-checkbox").checked = false;
+                            console.log("submit2");
+                        document.getElementById("input-form").submit();
+                    });
+                });
+            } else {
+                console.log("submit3");
+                document.getElementById("input-form").submit();
+            }
+        }
+    </script>
 }
 
 <div>
     <h6 class="display-4">Выберите валюту и количество</h6>
 
-    <form method="post">
+    <form id="input-form" method="post">
         <div class="form-group">
             <label class="form-label" asp-for="Currency">Выберите валюту</label>
             <select class="form-select" asp-for="Currency" asp-items="Html.GetEnumSelectList<CurrencyType>()"></select>
@@ -26,15 +47,17 @@
             <label class="form-check-label" asp-for="UseCurrency">Учитывать курс</label>
         </div>
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" asp-for="UseLocation" />
+            <input id="location-checkbox" class="form-check-input" type="checkbox" asp-for="UseLocation" />
             <label class="form-check-label" asp-for="UseLocation">Учитывать местоположение</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="checkbox" asp-for="UseRating" />
             <label class="form-check-label" asp-for="UseRating">Учитывать рейтинг</label>
         </div>
+        <input id="user-x" type="hidden" asp-for="UserX" />
+        <input id="user-y" type="hidden" asp-for="UserY" />
         <div class="form-group pt-2">
-            <input class="btn btn-primary" type="submit" value="Save" />
+            <input class="btn btn-primary" type="button" value="Save" onclick="addGeolocation()"/>
         </div>
     </form>
 </div>

@@ -54,12 +54,12 @@ namespace CEPAggregator.Classes
             public double Y;
         }
 
-        public const string PATH_TO_COORDS_FILE = "wwwroot/res/CEPs.json";
+        public const string PathToCoordsFile = "wwwroot/res/CEPs.json";
 
         private void AddCEPs()
         {
             List<CoordsDescription> coords;
-            using (StreamReader r = new StreamReader(PATH_TO_COORDS_FILE))
+            using (StreamReader r = new StreamReader(PathToCoordsFile))
             {
                 string json = r.ReadToEnd();
                 coords = JsonConvert.DeserializeObject<List<CoordsDescription>>(json);
