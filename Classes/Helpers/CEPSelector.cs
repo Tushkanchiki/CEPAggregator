@@ -22,9 +22,9 @@ namespace CEPAggregator.Classes.Helpers
         public class EvaluatedCEP
         {
             public CEP Cep { get; set; }
-            public double? Distance { get; set; }
-            public double? Rating { get; set; }
-            public double? Currency { get; set; }
+            public double Distance { get; set; } = double.MaxValue;
+            public double Rating { get; set; } = double.MinValue;
+            public double Rate { get; set; } = double.MaxValue;
         }
 
         private static double CalculateDistance(double x1, double y1, double x2, double y2)
@@ -34,7 +34,7 @@ namespace CEPAggregator.Classes.Helpers
             return coord1.GetDistanceTo(coord2) / 1000;
         }
 
-        public const double BaseDistanceStep = 7;
+        public const double BaseDistanceStep = 2;
         public const double AverageRating = 2.5;
         public static List<double> DistanceMilestones = new List<double> { 1, 2, 3, 4, 100 };
         public static List<double> RatingMilestones = new List<double> { 4.5, 3.5, 2, 0 };
@@ -56,10 +56,7 @@ namespace CEPAggregator.Classes.Helpers
         {
             foreach (var cep in ceps)
             {
-                if (cep.Distance == null)
-                {
-                    cep.Distance = CalculateDistance(_userX, _userY, cep.Cep.X, cep.Cep.Y);
-                }
+                cep.Distance = CalculateDistance(_userX, _userY, cep.Cep.X, cep.Cep.Y);
             }
         }
 
@@ -67,28 +64,43 @@ namespace CEPAggregator.Classes.Helpers
         {
             foreach (var cep in ceps)
             {
-                if (cep.Rating == null)
+                var ratings = _dbContext.Comments.Where(c => c.CEP == cep.Cep).Select(c => c.Rating);
+                if (ratings.Any())
                 {
-                    var ratings = _dbContext.Comments.Where(c => c.CEP == cep.Cep).Select(c => c.Rating);
-                    if (ratings.Any())
-                    {
-                        cep.Rating = ratings.Average();
-                    }
-                    else
-                    {
-                        cep.Rating = AverageRating;
-                    }
+                    cep.Rating = ratings.Average();
+                }
+                else
+                {
+                    cep.Rating = AverageRating;
                 }
             }
         }
 
         private void EvaluateWithCurrency(List<EvaluatedCEP> ceps)
         {
-            foreach (var cep in ceps)
+            var rateParsersReg = new HelperRateParsersRegistration();
+            var parsers = rateParsersReg.Parsers;
+            var allRates = new List<ExchangeRate>();
+            foreach (var parser in parsers)
             {
-                if (cep.Currency == null)
+                allRates.AddRange(parser.GetRates(_dbContext));
+            }
+            for (int i = ceps.Count - 1; i >= 0; i--)
+            {
+                var cep = ceps[i];
+                bool found = false;
+                foreach (var rate in allRates)
                 {
-
+                    if (cep.Cep == rate.Cep && rate.Target == _currencyType)
+                    {
+                        cep.Rate = rate.Rate;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    ceps.RemoveAt(i);
                 }
             }
         }
@@ -97,21 +109,19 @@ namespace CEPAggregator.Classes.Helpers
         {
             if (selParams.useLocation)
             {
-                EvaluateWithDistance(ceps);
                 ceps = new List<EvaluatedCEP>(ceps.OrderBy(cep => cep.Distance));
                 if (!selParams.useRating && !selParams.useCurrency)
                 {
                     return ceps.GetRange(0, selParams.selectCnt);
                 }
-                int firstIndex = 0;
+                int nextIndex = 0;
                 var res = new List<EvaluatedCEP>();
                 SelectionParams newParams = selParams;
                 newParams.useLocation = false;
-                var milestoneMult = Math.Max(BaseDistanceStep, ceps[0].Distance ?? 0);
+                var milestoneMult = Math.Max(BaseDistanceStep, ceps[0].Distance);
                 int leftToSelect = selParams.selectCnt;
                 for (int i = 0; i < DistanceMilestones.Count; i++)
                 {
-                    int nextIndex = firstIndex;
                     while (nextIndex < ceps.Count && ceps[nextIndex].Distance <= DistanceMilestones[i] * milestoneMult)
                     {
                         nextIndex++;
@@ -122,26 +132,23 @@ namespace CEPAggregator.Classes.Helpers
                     var selected = SelectCEPs(sublist, newParams);
                     leftToSelect -= selected.Count;
                     res = res.Concat(selected).ToList();
-                    firstIndex = nextIndex;
                 }
                 return res;
             }
             else if (selParams.useRating)
             {
-                EvaluateWithRating(ceps);
                 ceps = new List<EvaluatedCEP>(ceps.OrderBy(cep => -cep.Rating));
                 if (!selParams.useCurrency)
                 {
                     return ceps.GetRange(0, selParams.selectCnt);
                 }
-                int firstIndex = 0;
+                int nextIndex = 0;
                 var res = new List<EvaluatedCEP>();
                 SelectionParams newParams = selParams;
                 newParams.useRating = false;
                 int leftToSelect = selParams.selectCnt;
                 for (int i = 0; i < RatingMilestones.Count; i++)
                 {
-                    int nextIndex = firstIndex;
                     while (nextIndex < ceps.Count && ceps[nextIndex].Rating >= RatingMilestones[i])
                     {
                         nextIndex++;
@@ -152,14 +159,12 @@ namespace CEPAggregator.Classes.Helpers
                     var selected = SelectCEPs(sublist, newParams);
                     leftToSelect -= selected.Count;
                     res = res.Concat(selected).ToList();
-                    firstIndex = nextIndex;
                 }
                 return res;
             }
             else if (selParams.useCurrency)
             {
-                EvaluateWithCurrency(ceps);
-                ceps = new List<EvaluatedCEP>(ceps.OrderBy(cep => cep.Currency));
+                ceps = new List<EvaluatedCEP>(ceps.OrderBy(cep => cep.Rate));
                 return ceps.GetRange(0, selParams.selectCnt);
             }
             else
@@ -174,6 +179,26 @@ namespace CEPAggregator.Classes.Helpers
             foreach (var cur_cep in ceps)
             {
                 evaluatedCeps.Add(new EvaluatedCEP{Cep = cur_cep});
+            }
+            bool ok = false;
+            if (selParams.useLocation)
+            {
+                EvaluateWithDistance(evaluatedCeps);
+                ok = true;
+            }
+            if (selParams.useRating)
+            {
+                EvaluateWithRating(evaluatedCeps);
+                ok = true;
+            }
+            if (selParams.useCurrency)
+            {
+                EvaluateWithCurrency(evaluatedCeps);
+                ok = true;
+            }
+            if (!ok)
+            {
+                return evaluatedCeps;
             }
             return SelectCEPs(evaluatedCeps, selParams);
         }
