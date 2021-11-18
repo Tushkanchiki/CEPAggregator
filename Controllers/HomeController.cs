@@ -45,6 +45,10 @@ namespace CEPAggregator.Controllers
                 useRating = input.UseRating,
                 useCurrency = input.UseCurrency,
                 selectCnt = 20 });
+            if (!input.UseRating && !input.UseLocation && !input.UseCurrency)
+            {
+                return RedirectToAction("All", "Cep");
+            }
             return View("Results", res);
         }
 

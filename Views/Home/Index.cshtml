@@ -14,15 +14,13 @@
                         let coords = res.geoObjects.position;
                         document.getElementById("user-x").value = coords[0];
                         document.getElementById("user-y").value = coords[1];
-                        document.getElementById("input-form").submit();
+                        document.getElementById("input-form").requestSubmit();
                     }, function (e) {
-                            document.getElementById("location-checkbox").checked = false;
-                            console.log("submit2");
-                        document.getElementById("input-form").submit();
+                        document.getElementById("location-checkbox").checked = false;
+                        document.getElementById("input-form").requestSubmit();
                     });
                 });
             } else {
-                console.log("submit3");
                 document.getElementById("input-form").submit();
             }
         }
@@ -35,7 +33,17 @@
     <form id="input-form" method="post">
         <div class="form-group">
             <label class="form-label" asp-for="Currency">Выберите валюту</label>
-            <select class="form-select" asp-for="Currency" asp-items="Html.GetEnumSelectList<CurrencyType>()"></select>
+            @{
+                var selectList = Enum.GetValues(typeof(CurrencyType))
+                        .Cast<CurrencyType>()
+                        .Where(e => e != CurrencyType.BYN)
+                        .Select(e => new SelectListItem
+                        {
+                            Value = ((int)e).ToString(),
+                            Text = e.ToString()
+                        });
+            }
+            <select class="form-select" asp-for="Currency" asp-items="selectList"></select>
         </div>
         <div class="form-group">
             <label class="form-label" asp-for="Count">Выберите количество покупаемой валюты</label>
