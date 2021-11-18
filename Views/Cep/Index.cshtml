@@ -13,6 +13,7 @@
         map.Init().then(function () {
             map.Add([cep], false);
             map.Focus(cep.id);
+            map.RouteTo(cep.id);
         });
     });
 </script>
