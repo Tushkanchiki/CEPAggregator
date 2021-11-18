@@ -44,6 +44,12 @@ namespace CEPAggregator.Controllers
             return RedirectToAction("Index", id);
         }
 
+        [HttpGet]
+        public IActionResult All()
+        {
+            return View(_dbContext.CEPs.Include(c => c.Address).ThenInclude(a => a.City).ToList());
+        }
+
         private Dictionary<string, string> GetInfo(CEP cep)
         { 
             switch (cep.BankName)

@@ -10,9 +10,10 @@
     let map = new Map();
     ymaps.ready(function () {
         let cep = @Html.Raw(Json.Serialize(Model.Item1));
-        map.Init();
-        console.log(cep);
-        map.Add([cep]);
+        map.Init().then(function () {
+            map.Add([cep], false);
+            map.Focus(cep.id);
+        });
     });
 </script>
 

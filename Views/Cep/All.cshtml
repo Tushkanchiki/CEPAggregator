@@ -2,7 +2,7 @@
 @using CEPAggregator.Classes.Helpers;
 @using System.Text.Json;
 
-@model List<CEPSelector.EvaluatedCEP>
+@model List<CEP>
 
 @section scripts{
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
@@ -12,11 +12,7 @@
     <script type="text/javascript">
         let map = new Map();
         ymaps.ready(function () {
-            let evaluated_ceps = @Html.Raw(Json.Serialize(Model));
-            ceps = []
-            for (evaluated_cep of evaluated_ceps) {
-                ceps.push(evaluated_cep.cep);
-            }
+            let ceps = @Html.Raw(Json.Serialize(Model));
             map.Init().then(function () {
                 map.Add(ceps, true);
             });
