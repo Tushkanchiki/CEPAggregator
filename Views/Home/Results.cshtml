@@ -1,8 +1,9 @@
 ﻿@using CEPAggregator.Enums
 @using CEPAggregator.Classes.Helpers;
 @using System.Text.Json;
+@using CEPAggregator.Data
 
-@model List<CEPSelector.EvaluatedCEP>
+@model (List<CEPSelector.EvaluatedCEP>, InputModel, List<double>)
 
 @section scripts{
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
@@ -12,7 +13,7 @@
     <script type="text/javascript">
         let map = new Map();
         ymaps.ready(function () {
-            let evaluated_ceps = @Html.Raw(Json.Serialize(Model));
+            let evaluated_ceps = @Html.Raw(Json.Serialize(Model.Item1));
             ceps = []
             for (evaluated_cep of evaluated_ceps) {
                 ceps.push(evaluated_cep.cep);
@@ -29,3 +30,53 @@
 
     </div>
 </div>
+
+@foreach (var m in Model.Item1.Zip(Model.Item3, (c, p) => new { cep = c, price = p }))
+{
+    <div class="big-margin border border-3 rounded-3 p-2" style="border-color: #7b8ab8 !important">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h6 style="font-size: large">
+                @m.cep.Cep.BankName: @Html.RouteLink(m.cep.Cep.Name, new { controller = "Cep", action = "Index", id = m.cep.Cep.Id }, null)
+            </h6>
+
+            <div class="d-flex justify-content-end">
+                @if (m.cep.IsRatingExists)
+                {
+                    @for (int i = 0; i < m.cep.Rating; i++)
+                    {
+                        <img src="~/res/yes.png" height="30" />                    
+                    }                
+                }
+            </div>
+        </div>
+
+        <p>
+            Стоимость @Model.Item2.Count @Model.Item2.Currency составит @m.price BYN
+        </p>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                @m.cep.Cep.Address.City.Name, @m.cep.Cep.Address.Name
+            </div>
+            <div>
+                <img src="~/res/pointer.png" style="height: 30px" onclick="map.Focus(@m.cep.Cep.Id); document.getElementById('map').scrollIntoView();">
+            </div>
+        </div>
+
+        @if (m.price == Model.Item3.Min())
+        {
+            <div class="d-flex justify-content-end">
+                Самый дешевый
+            </div>
+        }
+
+        @if (Model.Item2.UseLocation && m.cep.Distance == Model.Item1.Min(q => q.Distance))
+        {
+            <div class="d-flex justify-content-end">
+                Самый близкий
+            </div>
+        }
+
+    </div>
+}

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using CEPAggregator.Classes;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace CEPAggregator.Hubs
     {
         public async Task SendRating(string message)
         {
-            int rating = 4;
+            var rating = OnnxModelWrapper.Predict(message);
             await Clients.Caller.SendAsync("GetRating", rating);
         }
     }

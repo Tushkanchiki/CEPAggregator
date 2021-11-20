@@ -35,7 +35,7 @@
                         @string.Concat(pair.Key, ": ")
                     </span>
                     <span>
-                        @pair.Value
+                        @Html.Raw(pair.Value)
                     </span>
                 </p>
             }

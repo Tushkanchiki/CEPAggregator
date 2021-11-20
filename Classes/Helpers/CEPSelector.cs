@@ -25,6 +25,7 @@ namespace CEPAggregator.Classes.Helpers
             public double Distance { get; set; } = double.MaxValue;
             public double Rating { get; set; } = double.MinValue;
             public double Rate { get; set; } = double.MaxValue;
+            public bool IsRatingExists { get; set; } = false;
         }
 
         private static double CalculateDistance(double x1, double y1, double x2, double y2)
@@ -35,7 +36,7 @@ namespace CEPAggregator.Classes.Helpers
         }
 
         public const double BaseDistanceStep = 2;
-        public const double AverageRating = 2.5;
+        public const double AverageRating = 3;
         public static List<double> DistanceMilestones = new List<double> { 1, 2, 3, 4, 100 };
         public static List<double> RatingMilestones = new List<double> { 4.5, 3.5, 2, 0 };
 
@@ -68,6 +69,7 @@ namespace CEPAggregator.Classes.Helpers
                 if (ratings.Any())
                 {
                     cep.Rating = ratings.Average();
+                    cep.IsRatingExists = true;
                 }
                 else
                 {

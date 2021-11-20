@@ -1,10 +1,13 @@
-﻿using CEPAggregator.Classes.Helpers;
+﻿using CEPAggregator.Classes;
+using CEPAggregator.Classes.Helpers;
 using CEPAggregator.Data;
+using CEPAggregator.Enums;
 using CEPAggregator.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -18,11 +21,13 @@ namespace CEPAggregator.Controllers
 
         private readonly ApplicationDbContext _dbContext;
 
+        private readonly PriceCalculator _calc;
 
-        public HomeController(ILogger<HomeController> logger, ApplicationDbContext dbContext)
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext dbContext, PriceCalculator calc)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _calc = calc;
         }
 
         [HttpGet]
@@ -41,7 +46,7 @@ namespace CEPAggregator.Controllers
                 userY = Double.Parse(input.UserY, CultureInfo.InvariantCulture);
             }
             var selector = new CEPSelector(userX, userY, input.Currency, _dbContext);
-            var res = selector.SelectCEPs(_dbContext.CEPs.ToList(), new CEPSelector.SelectionParams { useLocation = input.UseLocation,
+            var res = selector.SelectCEPs(_dbContext.CEPs.Include(c => c.Address).ThenInclude(a => a.City).ToList(), new CEPSelector.SelectionParams { useLocation = input.UseLocation,
                 useRating = input.UseRating,
                 useCurrency = input.UseCurrency,
                 selectCnt = 20 });
@@ -49,7 +54,8 @@ namespace CEPAggregator.Controllers
             {
                 return RedirectToAction("All", "Cep");
             }
-            return View("Results", res);
+            var prices = res.Select(r => _calc.CalcPrice(input.Currency, input.Count, r.Cep)).ToList();
+            return View("Results", (res, input, prices));
         }
 
         public IActionResult Privacy()
