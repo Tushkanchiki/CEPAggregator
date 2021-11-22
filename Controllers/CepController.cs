@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using CEPAggregator.Interfaces;
 
 namespace CEPAggregator.Controllers
 {
@@ -51,20 +52,34 @@ namespace CEPAggregator.Controllers
         }
 
         private Dictionary<string, string> GetInfo(CEP cep)
-        { 
+        {
+            Dictionary<string, string> res;
+            IInfoParser infoParser;
+            IRateParser rateParser;
             switch (cep.BankName)
             {
                 case Constants.Belarusbank:
-                    BelarusbankInfoParser parser1 = new BelarusbankInfoParser();
-                    return parser1.GetInfo(cep);
+                    infoParser = new BelarusbankInfoParser();
+                    rateParser = new BelarusbankRateParser();
+                    break;
                 case Constants.Dabrabyt:
-                    DabrabytInfoParser parser2 = new DabrabytInfoParser();
-                    return parser2.GetInfo(cep);
+                    infoParser = new DabrabytInfoParser();
+                    rateParser = new DabrabytRateParser();
+                    break;
                 case Constants.AgroBank:
-                    AgroInfoParser parser3 = new AgroInfoParser();
-                    return parser3.GetInfo(cep);
+                    infoParser = new AgroInfoParser();
+                    rateParser = new AgroRateParser();
+                    break;
+                default:
+                    return new Dictionary<string, string>();
             }
-            return new Dictionary<string, string>();
+            res = infoParser.GetInfo(cep);
+            var rates = rateParser.GetRates(_dbContext).Where(rate => rate.Cep == cep).ToList();
+            foreach (var rate in rates)
+            {
+                res[$"{rate.Target}"] = rate.Rate.ToString() + " BYN";
+            }
+            return res;
         }
     }
 }
