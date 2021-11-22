@@ -183,6 +183,7 @@ namespace CEPAggregator.Classes.Helpers
                 evaluatedCeps.Add(new EvaluatedCEP{Cep = cur_cep});
             }
             bool ok = false;
+            EvaluateWithCurrency(evaluatedCeps);
             if (selParams.useLocation)
             {
                 EvaluateWithDistance(evaluatedCeps);
@@ -195,7 +196,6 @@ namespace CEPAggregator.Classes.Helpers
             }
             if (selParams.useCurrency)
             {
-                EvaluateWithCurrency(evaluatedCeps);
                 ok = true;
             }
             if (!ok)
