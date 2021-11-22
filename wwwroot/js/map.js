@@ -90,6 +90,7 @@ class Map {
         for (let cep of this.ceps) {
             if (cep.id == cepId) {
                 this.map.setCenter([cep.x, cep.y]);
+                this.map.setZoom(18);
             }
         }
     }
